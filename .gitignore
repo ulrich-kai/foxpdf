@@ -1,0 +1,66 @@
+# ── Xcode ────────────────────────────────────────────────────────────────────
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+xcuserdata/
+
+# Build output
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Archived releases
+*.xcarchive
+
+# ── Swift Package Manager ────────────────────────────────────────────────────
+.build/
+.swiftpm/
+*.resolved
+
+# ── CocoaPods (falls verwendet) ──────────────────────────────────────────────
+Pods/
+Podfile.lock
+
+# ── macOS ────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+
+# ── Xcode Previews ───────────────────────────────────────────────────────────
+.swiftpm/xcode/package.xcworkspace
+
+# ── Simulator ────────────────────────────────────────────────────────────────
+*.moved-aside
+*.trim.txt
+
+# ── Fastlane (falls verwendet) ───────────────────────────────────────────────
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# ── Instruments ──────────────────────────────────────────────────────────────
+*.trace
+
+# ── Crashlytics ──────────────────────────────────────────────────────────────
+crashlytics-build.properties
+
+# ── Editor ───────────────────────────────────────────────────────────────────
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Secrets / Umgebungsvariablen ─────────────────────────────────────────────
+.env
+*.pem
+*.p12
+*.p8
+AuthKey_*.p8
