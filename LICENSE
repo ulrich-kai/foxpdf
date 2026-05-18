@@ -1,21 +1,267 @@
-MIT License
+# 🦊 FoxPDF
+
+**Teil der FoxSuite · Part of FoxSuite**
+`macOS` `iOS` `iPadOS`
+
+---
+
+## 📖 Inhaltsverzeichnis / Table of Contents
+
+- [README – Deutsch](#readme--deutsch)
+- [README – English](#readme--english)
+- [MIT-Lizenz – Deutsch](#mit-lizenz--deutsch)
+- [MIT License – English](#mit-license--english)
+
+---
+---
+
+# README – Deutsch
+
+## Über FoxPDF
+
+FoxPDF ist ein nativer, plattformübergreifender PDF-Kompressor für macOS, iOS und iPadOS. Die App reduziert die Dateigröße von PDF-Dokumenten um bis zu 95 % – ohne externe Dienste, ohne Cloud, ohne Internetverbindung.
+
+FoxPDF ist Teil der **FoxSuite** und folgt deren einheitlichem Designsystem (FoxTask · FoxTime · FoxVault · FoxPDF).
+
+---
+
+### 🔒 Datenschutz & Privatsphäre
+
+> **Alle Verarbeitungsschritte finden ausschließlich lokal auf deinem Gerät statt.**
+>
+> Es werden keine Daten an externe Server übertragen. Kein Cloud-Upload, keine Analysen, keine Telemetrie. Deine Dokumente verlassen dein Gerät nicht.
+>
+> Verwendete Frameworks: `CoreGraphics` · `PDFKit` · `ImageIO` *(alle Apple-intern, vollständig offline)*
+
+---
+
+## Funktionen
+
+| Feature | Beschreibung |
+|---|---|
+| PDF komprimieren | Bis zu 95 % Dateigrößenreduktion durch Bild-Downscaling und JPEG-Rekomprimierung |
+| Qualitätsprofile | Screen (72 dpi) · eBook (150 dpi) · Print (300 dpi) · High Quality (600 dpi) · Custom |
+| Batch-Verarbeitung | Beliebig viele PDFs in einem Durchlauf komprimieren |
+| Metadaten entfernen | Autor, Erstelldatum, Keywords, Producer werden auf Wunsch entfernt |
+| Custom-Modus | Frei einstellbare Bildqualität (5–100 %) und maximale Auflösung (72–600 dpi) |
+| macOS: Drag & Drop | Dateien direkt ins Fenster ziehen |
+| iOS/iPadOS: Datei-Picker | Systemweiter Datei-Picker mit ShareSheet-Export |
+| Ergebnisanzeige | Vorher/Nachher-Größe und Einsparungsprozent pro Datei |
+
+## Typische Einsparungen
+
+| Profil | Qualität | Max. DPI | Einsparung (scan-lastige PDFs) |
+|---|---|---|---|
+| Screen | 25 % | 72 | 85–95 % |
+| eBook | 50 % | 150 | 60–80 % |
+| Print | 75 % | 300 | 30–50 % |
+| High Quality | 92 % | 600 | 10–25 % |
+
+## Voraussetzungen
+
+- macOS 13 Ventura oder neuer
+- iOS / iPadOS 16.0 oder neuer
+- Xcode 15 oder neuer
+- Swift 5.9 / Swift 6 kompatibel
+
+## Setup in Xcode
+
+### 1. Multiplatform-Projekt anlegen
+
+```
+File → New → Project → Multiplatform → App
+Product Name:  FoxPDF
+Bundle ID:     com.deinname.foxpdf
+Deployment:    macOS 13.0 · iOS 16.0
+```
+
+### 2. Dateien hinzufügen
+
+| Datei | Inhalt |
+|---|---|
+| `FoxPDFApp.swift` | `@main` Einstiegspunkt |
+| `PDFCompressor.swift` | Komprimierungs-Engine (plattformunabhängig) |
+| `FoxDesignSystem.swift` | FoxSuite Farben & Styles |
+| `ContentView.swift` | Adaptive Haupt-UI (macOS + iOS) |
+| `SharedViews.swift` | FoxFileRow, FoxResultCard, iOS SettingsSheet |
+
+### 3. Entitlements (macOS Target)
+
+```
+App Sandbox: ON
+File Access → User Selected Files: Read/Write
+```
+
+## Technische Architektur
+
+Die Komprimierung erfolgt in drei Schritten:
+
+1. Jede PDF-Seite wird in einen `CGBitmapContext` auf die Ziel-DPI gerendert
+2. Der Bitmap wird als JPEG mit einstellbarer Qualität via `CGImageDestination` neu enkodiert
+3. Die rekomprimierten Seiten werden zu einem neuen PDF via `CGContext` zusammengeführt
+
+```
+FoxPDFApp.swift
+  └── ContentView.swift          (platform-adaptive via #if os(macOS))
+        ├── macOS: HSplitView    (DropZone | Settings | Results)
+        └── iOS:   ScrollView    (Cards, Preset-Chips, FloatingButton)
+
+PDFCompressor.swift              (@MainActor ObservableObject)
+  └── FoxPDFEngine               (nonisolated – kein AppKit/UIKit)
+        ├── CoreGraphics PDF-Context
+        ├── CGBitmapContext Downscaling
+        └── CGImageDestination JPEG-Rekomprimierung
+
+FoxDesignSystem.swift            (Color-Extensions, Styles)
+SharedViews.swift                (FoxFileRow, FoxResultCard, SettingsSheet)
+```
+
+> Das Original wird **nie** überschrieben. Ausgabe: `dateiname_compressed.pdf`
+
+---
+---
+
+# README – English
+
+## About FoxPDF
+
+FoxPDF is a native, cross-platform PDF compressor for macOS, iOS, and iPadOS. It reduces PDF file sizes by up to 95% — without any external services, cloud uploads, or internet connection.
+
+FoxPDF is part of the **FoxSuite** app family and follows its unified design system (FoxTask · FoxTime · FoxVault · FoxPDF).
+
+---
+
+### 🔒 Privacy & Data Protection
+
+> **All processing happens exclusively on your device.**
+>
+> No data is transmitted to external servers. No cloud upload, no analytics, no telemetry. Your documents never leave your device.
+>
+> Frameworks used: `CoreGraphics` · `PDFKit` · `ImageIO` *(all Apple-native, fully offline)*
+
+---
+
+## Features
+
+| Feature | Description |
+|---|---|
+| PDF Compression | Up to 95% file size reduction via image downscaling and JPEG recompression |
+| Quality Presets | Screen (72 dpi) · eBook (150 dpi) · Print (300 dpi) · High Quality (600 dpi) · Custom |
+| Batch Processing | Compress any number of PDFs in a single run |
+| Metadata Removal | Optionally strips author, creation date, keywords, producer |
+| Custom Mode | Freely adjustable image quality (5–100%) and max resolution (72–600 dpi) |
+| macOS: Drag & Drop | Drop files directly into the window |
+| iOS/iPadOS: File Picker | System file picker with ShareSheet export |
+| Results View | Before/after size and savings percentage per file |
+
+## Typical Savings
+
+| Preset | Quality | Max DPI | Savings (scan-heavy PDFs) |
+|---|---|---|---|
+| Screen | 25% | 72 | 85–95% |
+| eBook | 50% | 150 | 60–80% |
+| Print | 75% | 300 | 30–50% |
+| High Quality | 92% | 600 | 10–25% |
+
+## Requirements
+
+- macOS 13 Ventura or later
+- iOS / iPadOS 16.0 or later
+- Xcode 15 or later
+- Swift 5.9 / Swift 6 compatible
+
+## Xcode Setup
+
+### 1. Create Multiplatform Project
+
+```
+File → New → Project → Multiplatform → App
+Product Name:  FoxPDF
+Bundle ID:     com.yourname.foxpdf
+Deployment:    macOS 13.0 · iOS 16.0
+```
+
+### 2. Add Files
+
+| File | Contents |
+|---|---|
+| `FoxPDFApp.swift` | `@main` entry point |
+| `PDFCompressor.swift` | Compression engine (platform-independent) |
+| `FoxDesignSystem.swift` | FoxSuite colors & styles |
+| `ContentView.swift` | Adaptive main UI (macOS + iOS) |
+| `SharedViews.swift` | FoxFileRow, FoxResultCard, iOS SettingsSheet |
+
+### 3. Entitlements (macOS Target)
+
+```
+App Sandbox: ON
+File Access → User Selected Files: Read/Write
+```
+
+## Technical Architecture
+
+Compression happens in three steps:
+
+1. Each PDF page is rendered into a `CGBitmapContext` at the target DPI
+2. The bitmap is reencoded as JPEG at the chosen quality via `CGImageDestination`
+3. Recompressed pages are assembled into a new PDF via `CGContext`
+
+```
+FoxPDFApp.swift
+  └── ContentView.swift          (platform-adaptive via #if os(macOS))
+        ├── macOS: HSplitView    (DropZone | Settings | Results)
+        └── iOS:   ScrollView    (Cards, Preset-Chips, FloatingButton)
+
+PDFCompressor.swift              (@MainActor ObservableObject)
+  └── FoxPDFEngine               (nonisolated – no AppKit/UIKit)
+        ├── CoreGraphics PDF-Context
+        ├── CGBitmapContext Downscaling
+        └── CGImageDestination JPEG Recompression
+
+FoxDesignSystem.swift            (Color extensions, Styles)
+SharedViews.swift                (FoxFileRow, FoxResultCard, SettingsSheet)
+```
+
+> The original file is **never** modified. Output: `filename_compressed.pdf`
+
+---
+---
+
+# MIT-Lizenz – Deutsch
 
 Copyright (c) 2026 Kai Ulrich
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Hiermit wird jeder Person, die eine Kopie dieser Software und der zugehörigen Dokumentationsdateien (die „Software") erhält, kostenlos die Erlaubnis erteilt, uneingeschränkt mit der Software zu handeln, einschließlich und ohne Einschränkung der Rechte, die Software zu nutzen, zu kopieren, zu verändern, zusammenzuführen, zu veröffentlichen, zu vertreiben, unterzulizenzieren und/oder Kopien der Software zu verkaufen, und Personen, denen die Software zur Verfügung gestellt wird, dies zu erlauben, vorbehaltlich der folgenden Bedingungen:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Der obige Urheberrechtshinweis und dieser Genehmigungshinweis müssen in allen Kopien oder wesentlichen Teilen der Software enthalten sein.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+DIE SOFTWARE WIRD OHNE JEDE AUSDRÜCKLICHE ODER IMPLIZIERTE GARANTIE BEREITGESTELLT, EINSCHLIEẞLICH DER GARANTIE ZUR BENUTZBARKEIT, EIGNUNG FÜR EINEN BESTIMMTEN ZWECK UND NICHTVERLETZUNG. IN KEINEM FALL SIND DIE AUTOREN ODER URHEBERRECHTSINHABER FÜR ANSPRÜCHE, SCHÄDEN ODER ANDERE VERPFLICHTUNGEN HAFTBAR, OB IN EINER VERTRAGS- ODER HAFTUNGSKLAGE, EINER UNERLAUBTEN HANDLUNG ODER ANDERWEITIG, DIE SICH AUS, AUS ODER IN VERBINDUNG MIT DER SOFTWARE ODER DER NUTZUNG ODER ANDEREN GESCHÄFTEN MIT DER SOFTWARE ENTSTEHEN.
+
+---
+
+### 🔒 Datenschutzhinweis (Lizenzergänzung)
+
+> Diese Software verarbeitet alle Daten ausschließlich lokal auf dem Gerät des Nutzers. Es findet keinerlei Übertragung von Nutzer- oder Dokumentendaten an externe Server, Cloud-Dienste oder Dritte statt. Die Nutzung dieser Software ist daher mit den Anforderungen der **DSGVO (EU 2016/679)** vereinbar, soweit keine weitere Verarbeitung durch den Betreiber erfolgt.
+
+---
+---
+
+# MIT License – English
+
+Copyright (c) 2026 Kai Ulrich
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+### 🔒 Privacy Notice (License Addendum)
+
+> This software processes all data exclusively on the user's local device. No user data or document content is transmitted to external servers, cloud services, or third parties. Usage of this software is therefore compatible with **GDPR (EU 2016/679)** requirements, provided no further processing is performed by the operator.
+
+---
+
+*FoxPDF · FoxSuite · © 2026 Kai Ulrich*
